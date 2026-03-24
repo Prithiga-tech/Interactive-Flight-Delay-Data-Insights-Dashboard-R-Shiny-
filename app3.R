@@ -1,14 +1,8 @@
-# ================================
-# 📦 Load Libraries
-# ================================
 library(shiny)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-# ================================
-# 📊 Create Dataset
-# ================================
 flights_data <- data.frame(
   Flight_ID = c("AA101","BA202","DL303","UA404","AA105","BA206","DL307","UA408"),
   Airline = c("American","British Airways","Delta","United","American","British Airways","Delta","United"),
@@ -24,19 +18,15 @@ weather_data <- data.frame(
   Temperature = c(15,22,8,30)
 )
 
-# Merge
 merged_data <- flights_data %>%
   left_join(weather_data, by = "Origin")
 
-# Reshape
 long_data <- merged_data %>%
   pivot_longer(cols = c(Departure_Delay, Arrival_Delay),
                names_to = "Delay_Type",
                values_to = "Delay_Value")
 
-# ================================
-# 🖥️ UI
-# ================================
+
 ui <- fluidPage(
   
   titlePanel("✈️ Flight Delay Dashboard (Interactive Colors)"),
@@ -58,16 +48,12 @@ ui <- fluidPage(
   )
 )
 
-# ================================
-# ⚙️ Server
-# ================================
 server <- function(input, output) {
   
   filtered <- reactive({
     merged_data %>% filter(Airline == input$airline)
   })
   
-  # 🎨 Dynamic color palette
   get_colors <- reactive({
     if(input$airline == "American") return("Blues")
     if(input$airline == "Delta") return("Reds")
@@ -75,7 +61,6 @@ server <- function(input, output) {
     return("Purples")
   })
   
-  # 📊 Delay Plot (Gradient Colors)
   output$delayPlot <- renderPlot({
     long_data %>%
       filter(Airline == input$airline,
@@ -89,7 +74,6 @@ server <- function(input, output) {
            y = "Delay (min)")
   })
   
-  # 🌦️ Weather Plot (Colorful)
   output$weatherPlot <- renderPlot({
     filtered() %>%
       ggplot(aes(x = Weather_Condition,
@@ -103,13 +87,8 @@ server <- function(input, output) {
            y = "Delay")
   })
   
-  # 📋 Table
   output$dataTable <- renderTable({
     filtered()
   })
 }
-
-# ================================
-# 🚀 Run App
-# ================================
 shinyApp(ui = ui, server = server)
