@@ -18,7 +18,7 @@ It demonstrates core data science concepts including:
 * Understand the impact of weather on delays
 * Provide an interactive interface for users
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 * **R**
 * **Shiny**
